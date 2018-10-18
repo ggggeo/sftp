@@ -134,10 +134,10 @@ sftp_list <- function(sftp_connection = sftp_con,
         if (v) { message(mess) }
     }
 
-    cond_message(paste("SFTP url:", sftp_con$url))
+    cond_message(paste("SFTP url:", sftp_connection$url))
     curlOptionsValue <- "ftplistonly = T"
-    rawstring <- RCurl::getURL(url = sftp_con$url,
-                               userpwd = sftp_con$userpass,
+    rawstring <- RCurl::getURL(url = sftp_connection$url,
+                               userpwd = sftp_connection$userpass,
                                verbose = curlPerformVerbose,
                                ftp.use.epsv = FALSE,
                                .opts = RCurl::curlOptions(curlOptionsValue) )
@@ -191,7 +191,7 @@ sftp_listfiles <- function(sftp_connection = sftp_con,
                            verbose = TRUE,
                            curlPerformVerbose = FALSE) {
 
-    final <- sftp_list(sftp_connection = sft_connection,
+    final <- sftp_list(sftp_connection = sftp_connection,
                        verbose = verbose,
                        curlPerformVerbose = curlPerformVerbose,
                        type = "file")
@@ -229,7 +229,7 @@ sftp_listdirs <- function(sftp_connection = sftp_con,
                            verbose = TRUE,
                            curlPerformVerbose = FALSE) {
 
-    final <- sftp_list(sftp_connection = sft_connection,
+    final <- sftp_list(sftp_connection = sftp_connection,
                        verbose = verbose,
                        curlPerformVerbose = curlPerformVerbose,
                        type = "dir")
@@ -293,13 +293,13 @@ sftp_download <- function(file,
         if (v) { message(mess) }
     }
 
-    cond_message(paste("SFTP source:", sftp_con$url))
+    cond_message(paste("SFTP source:", sftp_connection$url))
     cond_message(paste("Save to folder:", tofolder))
     if (using_wildcard) { cond_message("Downloading all files.") }
     cond_message(paste(length(file), "file(s) to download."))
     filecounter = 0
     for (f in file) {
-        fileurl <- paste0(sftp_con$login_url, f)
+        fileurl <- paste0(sftp_connection$login_url, f)
         filedestination <- file.path(tofolder, f)
         writeBin(object = getBinaryURL(url = fileurl, dirlistonly = FALSE), con = filedestination)
         filecounter = filecounter + 1
@@ -365,13 +365,13 @@ sftp_upload <- function(file,
     }
 
     cond_message(paste("Upload from folder:", fromfolder))
-    cond_message(paste("SFTP destination:", sftp_con$url))
+    cond_message(paste("SFTP destination:", sftp_connection$url))
     if (using_wildcard) { cond_message("Uploading all files.") }
     cond_message(paste(length(file), "file(s) to upload."))
     filecounter = 0
     for (f in file) {
         filesource <- file.path(fromfolder, f)
-        fileurl    <- paste0(sftp_con$login_url, f)
+        fileurl    <- paste0(sftp_connection$login_url, f)
         ftpUpload(what = filesource, to = fileurl, asText = FALSE)
         filecounter = filecounter + 1
         cond_message(paste(f, "uploaded") )
@@ -428,10 +428,10 @@ sftp_delete <- function(file,
     cond_message(paste(length(file), "file(s) to delete."))
     filecounter = 0
     for (f in file) {
-        deletepath <- paste0("'/", sftp_con$folder, "/", f, "'")
+        deletepath <- paste0("'/", sftp_connection$folder, "/", f, "'")
         cond_message(deletepath)
-        curlPerform(url = sftp_con$url,
-                    userpwd = sftp_con$userpass,
+        curlPerform(url = sftp_connection$url,
+                    userpwd = sftp_connection$userpass,
                     verbose = curlPerformVerbose,
                     quote = paste("rm", deletepath) )
         filecounter = filecounter + 1
@@ -517,11 +517,11 @@ sftp_rename<- function(from,
         if (v) { message(mess) }
     }
 
-    from <- paste0("'/", sftp_con$folder, "/", from, "'")
-    to   <- paste0("'/", sftp_con$folder, "/", to, "'")
+    from <- paste0("'/", sftp_connection$folder, "/", from, "'")
+    to   <- paste0("'/", sftp_connection$folder, "/", to, "'")
     argument <- paste("rename", from, to)
-    curlPerform(url = sftp_con$url,
-                userpwd = sftp_con$userpass,
+    curlPerform(url = sftp_connection$url,
+                userpwd = sftp_connection$userpass,
                 verbose = curlPerformVerbose,
                 quote = argument )
     cond_message(paste("Old name:", from))
@@ -585,14 +585,14 @@ sftp_makedir <- function(foldername,
         if (v) { message(mess) }
     }
 
-    cond_message(paste("SFTP url:", sftp_con$url))
+    cond_message(paste("SFTP url:", sftp_connection$url))
     cond_message(paste(length(foldername), "folder(s) to create."))
     filecounter = 0
     for (f in foldername) {
-        curlPerform(url = sftp_con$url,
-                    userpwd = sftp_con$userpass,
+        curlPerform(url = sftp_connection$url,
+                    userpwd = sftp_connection$userpass,
                     verbose = curlPerformVerbose,
-                    quote = paste0("mkdir ", "'/", sftp_con$folder, "/", f, "'") )
+                    quote = paste0("mkdir ", "'/", sftp_connection$folder, "/", f, "'") )
         filecounter = filecounter + 1
         cond_message(paste(f, "folder created.") )
     }
@@ -656,14 +656,14 @@ sftp_removedir <- function(foldername,
         if (v) { message(mess) }
     }
 
-    cond_message(paste("SFTP url:", sftp_con$url))
+    cond_message(paste("SFTP url:", sftp_connection$url))
     cond_message(paste(length(foldername), "folder(s) to remove."))
     filecounter = 0
     for (f in foldername) {
-        curlPerform(url = sftp_con$url,
-                    userpwd = sftp_con$userpass,
+        curlPerform(url = sftp_connection$url,
+                    userpwd = sftp_connection$userpass,
                     verbose = curlPerformVerbose,
-                    quote = paste0("rmdir ", "'/", sftp_con$folder, "/", f, "'") )
+                    quote = paste0("rmdir ", "'/", sftp_connection$folder, "/", f, "'") )
         filecounter = filecounter + 1
         cond_message(paste(f, "folder removed.") )
     }
